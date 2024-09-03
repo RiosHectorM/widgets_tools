@@ -20,19 +20,21 @@ class _ProgressView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Center(
-      child: Column(
-        children: [
-          SizedBox(height: 30),
-          Text('Circular Progress Indicator'),
-          SizedBox(height: 10),
-          CircularProgressIndicator(strokeWidth: 5, backgroundColor: Colors.black38,),
-          SizedBox(height: 20),
-          Text('Cirular y Lineal Progress Indicator Controlado'),
-          SizedBox(height: 10),
-          _ControledProgressIndicator()
-        ],
-      )
-    );
+        child: Column(
+      children: [
+        SizedBox(height: 30),
+        Text('Circular Progress Indicator'),
+        SizedBox(height: 10),
+        CircularProgressIndicator(
+          strokeWidth: 5,
+          backgroundColor: Colors.black38,
+        ),
+        SizedBox(height: 20),
+        Text('Cirular y Lineal Progress Indicator Controlado'),
+        SizedBox(height: 10),
+        _ControledProgressIndicator()
+      ],
+    ));
   }
 }
 
@@ -41,11 +43,31 @@ class _ControledProgressIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.red
-      ),
-      height: 3.5,
-    );
+    return StreamBuilder(
+        stream: Stream.periodic(const Duration(milliseconds: 300), (value) {
+          return (value * 2) / 100;
+        }).takeWhile((value) => value < 100),
+        builder: (context, snapshot) {
+
+          final progressValue = snapshot.data ?? 0;
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(
+                  value: progressValue,
+                  strokeWidth: 2,
+                  backgroundColor: Colors.black12,
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+                Expanded(child: LinearProgressIndicator(value: progressValue,))
+              ],
+            ),
+          );
+        });
   }
 }
