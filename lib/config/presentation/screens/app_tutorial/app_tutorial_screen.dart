@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:widgets_tools/config/presentation/screens/buttons/buttons_screen.dart';
 import 'package:go_router/go_router.dart';
+import 'package:animate_do/animate_do.dart';
 
 class SlideInfo {
   final String title;
@@ -37,12 +37,26 @@ class AppTutorialScreen extends StatefulWidget {
 }
 
 class _AppTutorialScreenState extends State<AppTutorialScreen> {
-  final PageController pageViewController = PageController();
+  final PageController pageController = PageController();
+  bool endReached = false;
 
   @override
   void initState() {
     super.initState();
-    
+    pageController.addListener(() {
+      final page = pageController.page ?? 0;
+      if (!endReached && page >= (slides.length - 1.5)) {
+        setState(() {
+          endReached = true;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    pageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -52,6 +66,7 @@ class _AppTutorialScreenState extends State<AppTutorialScreen> {
       body: Stack(
         children: [
           PageView(
+            controller: pageController,
             physics: const BouncingScrollPhysics(),
             children: slides
                 .map((slideData) => _Slide(
@@ -66,7 +81,20 @@ class _AppTutorialScreenState extends State<AppTutorialScreen> {
               child: TextButton(
                 child: const Text("Skip"),
                 onPressed: () => context.pop(),
-              ))
+              )),
+          endReached
+              ? Positioned(
+                  bottom: 30,
+                  right: 30,
+                  child: FadeInRight(
+                    from: 15,
+                    duration: const Duration(seconds: 1),
+                    child: FilledButton(
+                      child: const Text('Comenzar'),
+                      onPressed: () => context.pop(),
+                    ),
+                  ))
+              : const SizedBox()
         ],
       ),
     );
