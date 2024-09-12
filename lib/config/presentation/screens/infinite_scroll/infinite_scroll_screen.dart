@@ -10,22 +10,69 @@ class InfiniteScrollScreen extends StatefulWidget {
 
 class _InfiniteScrollScreenState extends State<InfiniteScrollScreen> {
   List<int> imagesIds = [1, 2, 3, 4, 5];
+  final ScrollController scrollController = ScrollController();
+  bool isLoading = false;
+  bool isMounted = true;
+
+  @override
+  void initState() {
+    scrollController.addListener(() {
+      if ((scrollController.position.pixels + 500) >=
+          scrollController.position.maxScrollExtent) {
+        loadNextPage();
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    isMounted = false;
+    super.dispose();
+  }
+
+  Future loadNextPage() async {
+    if (isLoading) return;
+    isLoading = true;
+    setState(() {});
+    await Future.delayed(const Duration(seconds: 2));
+    addFiveImages();
+    isLoading = false;
+    if (!isMounted) return;
+    setState(() {});
+  }
+
+  void addFiveImages() {
+    final lastImage = imagesIds.last;
+    imagesIds.addAll([1, 2, 3, 4, 5].map((e) => lastImage + e));
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView.builder(
-        itemCount: imagesIds.length,
-        itemBuilder: (context, index) {
-        return FadeInImage(
-            width: double.infinity,
-            height: 300,
-            fit: BoxFit.cover,
-            placeholder: const AssetImage('assets/images/jar-loading.gif'),
-            image: NetworkImage('https://picsum.photos/id/${imagesIds[index]}/500/300'));
-      }),
+      backgroundColor: Colors.black,
+      body: MediaQuery.removePadding(
+        context: context,
+        removeTop: true,
+        removeBottom: true,
+        child: ListView.builder(
+            controller: scrollController,
+            itemCount: imagesIds.length,
+            itemBuilder: (context, index) {
+              return FadeInImage(
+                  width: double.infinity,
+                  height: 300,
+                  fit: BoxFit.cover,
+                  placeholder:
+                      const AssetImage('assets/images/jar-loading.gif'),
+                  image: NetworkImage(
+                      'https://picsum.photos/id/${imagesIds[index]}/500/300'));
+            }),
+      ),
       floatingActionButton: FloatingActionButton(
-        onPressed: ()=>context.pop()
+        onPressed: () => context.pop(),
+        child: const Icon(Icons.arrow_back_ios_new_outlined),
       ),
     );
   }
