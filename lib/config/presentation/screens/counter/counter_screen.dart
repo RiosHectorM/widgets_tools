@@ -21,7 +21,6 @@ class CounterScreen extends ConsumerWidget {
                 ref.read(isDarkModeProvider.notifier).state = !isDarkMode;      
               }, 
             )],
-
       ),
       body: Center(
         child: Text('Valor: $clickCounter'),
