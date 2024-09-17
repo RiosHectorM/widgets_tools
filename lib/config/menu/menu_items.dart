@@ -68,4 +68,10 @@ const appMenuItems = <MenuItem>[
     link: '/infinite-scroll', 
     icon: Icons.list_alt_rounded,
     ),
+    MenuItem(
+    title: 'Cambiar Color de Tema', 
+    subTitle: 'Cambiar colores de la Aplicacion', 
+    link: '/theme-changer', 
+    icon: Icons.color_lens_outlined
+    ),
 ];
